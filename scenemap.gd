@@ -6,18 +6,18 @@ var menu = Control.new()
 var active
 
 func _selection_changed():
-	var selection = get_selection().get_selected_nodes()
-	var shouldShow = selection.size() == 1
+	var selectedNodes = get_selection().get_selected_nodes()
+	var selecton = selectedNodes[0] if selectedNodes.size() == 1 else null
+	var shouldShow = selecton and selecton.get_script() and selecton.get_script().get_name() == SCRIPT_NAME
 	if not active:
 		if shouldShow:
-			addControl(selection[0])
+			addControl(selecton)
 	else:
-		if not shouldShow:
+		if selecton and not shouldShow:
 			removeControl()
 
 func _ready():
-	selection = get_selection()
-	selection.connect("selection_changed", self, "_selection_changed")
+	get_selection().connect("selection_changed", self, "_selection_changed")
 	
 
 func _enter_tree():
