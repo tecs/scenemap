@@ -1,3 +1,4 @@
+tool
 extends Node2D
 
 const MODE_SQUARE = 0
@@ -19,11 +20,20 @@ export(int, "Top Left", "Bottom Left", "Center") var tileOrigin = ORIGIN_TOP_LEF
 export(bool) var ySort = false setget _setEnableYSort
 
 var sortNode
+var selected = false setget _setSelected
 
 func _draw():
-	if get_tree().is_editor_hint():
-		pass # draw grid
-	# draw set
+	if get_tree().is_editor_hint() and selected:
+		draw_set_transform(Vector2(), PI/4 if mode == MODE_ISOMETRIC else 0, size / sqrt(2) if mode == MODE_ISOMETRIC else size)
+		var gridSize = 100
+		var gridColor = Color(1, 0.3, 0, 0.2)
+		var axisColor = Color(1, 0.8, 0.5, 0.4)
+		for i in range(gridSize * 2 + 1):
+			draw_line(Vector2(-gridSize, i - gridSize), Vector2(gridSize, i - gridSize), gridColor)
+		for i in range(gridSize * 2 + 1):
+			draw_line(Vector2(i - gridSize, -gridSize), Vector2(i - gridSize, gridSize), gridColor)
+		draw_line(Vector2(-gridSize, 0), Vector2(gridSize, 0), axisColor)
+		draw_line(Vector2(0, -gridSize), Vector2(0, gridSize), axisColor)
 
 func _setMode(newMode):
 	mode = newMode
@@ -45,6 +55,10 @@ func _setEnableYSort(enabled):
 	ySort = enabled
 	if sortNode:
 		sortNode.set_sort_enabled(enabled)
+	update()
+
+func _setSelected(newState):
+	selected = newState
 	update()
 
 func _ready():
