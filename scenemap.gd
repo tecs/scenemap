@@ -2,7 +2,7 @@ tool
 extends EditorPlugin
 
 var control = preload("control.tscn").instance()
-var selection
+var menu = Control.new()
 var active
 
 func _selection_changed():
@@ -32,6 +32,7 @@ func addControl(selection):
 		active = selection
 		active.selected = true
 		active.update()
+		add_control_to_container(CONTAINER_CANVAS_EDITOR_MENU, menu)
 		add_control_to_container(CONTAINER_CANVAS_EDITOR_SIDE, control)
 
 func removeControl():
@@ -41,3 +42,5 @@ func removeControl():
 		active = null
 		if (control.get_parent()):
 			control.get_parent().remove_child(control)
+		if (menu.get_parent()):
+			menu.get_parent().remove_child(menu)
