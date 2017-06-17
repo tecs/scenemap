@@ -1,6 +1,8 @@
 tool
 extends EditorPlugin
 
+const SCRIPT_NAME = "_Scene_Map_Node_Script_"
+
 var control = preload("control.tscn").instance()
 var menu = Control.new()
 var active
@@ -21,7 +23,9 @@ func _ready():
 	
 
 func _enter_tree():
-	add_custom_type("SceneMap", "Node2D", preload("scenemap_node.gd"), preload("icon.png"))
+	var script = preload("scenemap_node.gd")
+	script.set_name(SCRIPT_NAME)
+	add_custom_type("SceneMap", "Node2D", script, preload("icon.png"))
 
 func _exit_tree():
 	remove_custom_type("SceneMap")
