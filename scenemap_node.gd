@@ -11,11 +11,11 @@ const ORIGIN_TOP_LEFT = 0
 const ORIGIN_BOTTOM_LEFT = 1
 const ORIGIN_CENTER = 2
 
-export(int, "Square", "Isometric") var mode = MODE_SQUARE
-export(PackedScene) var sceneSet setget _setSceneSet
-export(Vector2) var size = Vector2(64, 64)
-export(int, "Disabled", "Offset X", "Offset Y") var halfOffset = OFFSET_DISABLED
-export(int, "Top Left", "Bottom Left", "Center") var tileOrigin = ORIGIN_TOP_LEFT
+export(int, "Square", "Isometric") var mode = MODE_SQUARE setget _setMode
+export(PackedScene) var sceneSet
+export(Vector2) var size = Vector2(64, 64) setget _setSize
+export(int, "Disabled", "Offset X", "Offset Y") var halfOffset = OFFSET_DISABLED setget _setHalfOffset
+export(int, "Top Left", "Bottom Left", "Center") var tileOrigin = ORIGIN_TOP_LEFT setget _setTileOrigin
 export(bool) var ySort = false setget _setEnableYSort
 
 var sortNode
@@ -25,13 +25,27 @@ func _draw():
 		pass # draw grid
 	# draw set
 
-func _setSceneSet(set):
-	sceneSet = set.instance() if set else null
+func _setMode(newMode):
+	mode = newMode
+	update()
+
+func _setSize(newSize):
+	size = newSize
+	update()
+
+func _setHalfOffset(newHalfOffset):
+	halfOffset = newHalfOffset
+	update()
+
+func _setTileOrigin(newTileOrigin):
+	tileOrigin = newTileOrigin
+	update()
 
 func _setEnableYSort(enabled):
 	ySort = enabled
 	if sortNode:
 		sortNode.set_sort_enabled(enabled)
+	update()
 
 func _ready():
 	sortNode = YSort.new()
