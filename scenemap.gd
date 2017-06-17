@@ -29,10 +29,15 @@ func _exit_tree():
 
 func addControl(selection):
 	if not active:
-		add_control_to_container(CONTAINER_CANVAS_EDITOR_SIDE, control)
 		active = selection
+		active.selected = true
+		active.update()
+		add_control_to_container(CONTAINER_CANVAS_EDITOR_SIDE, control)
 
 func removeControl():
 	if active:
-		control.get_parent().remove_child(control)
+		active.selected = false
+		active.update()
 		active = null
+		if (control.get_parent()):
+			control.get_parent().remove_child(control)
