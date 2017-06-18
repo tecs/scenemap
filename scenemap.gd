@@ -16,10 +16,15 @@ func _enter_tree():
 	var script = preload("scenemap_node.gd")
 	script.set_name(SCRIPT_NAME)
 	add_custom_type("SceneMap", "Node2D", script, preload("icon.png"))
+	add_control_to_container(CONTAINER_CANVAS_EDITOR_MENU, menu)
+	add_control_to_container(CONTAINER_CANVAS_EDITOR_SIDE, control)
+	menu.hide()
+	control.hide()
 
 func _exit_tree():
 	remove_custom_type("SceneMap")
-	removeControl()
+	if control and control.get_parent(): control.get_parent().remove_child(control)
+	if menu and menu.get_parent(): menu.get_parent().remove_child(menu)
 
 # Handlers
 func _selection_changed():
@@ -37,15 +42,14 @@ func addControl(selection):
 		active = selection
 		active.selected = true
 		active.update()
-		add_control_to_container(CONTAINER_CANVAS_EDITOR_MENU, menu)
-		add_control_to_container(CONTAINER_CANVAS_EDITOR_SIDE, control)
+		
+		menu.show()
+		control.show()
 
 func removeControl():
 	if active:
 		active.selected = false
 		active.update()
 		active = null
-		if (control.get_parent()):
-			control.get_parent().remove_child(control)
-		if (menu.get_parent()):
-			menu.get_parent().remove_child(menu)
+		control.hide()
+		menu.hide()
