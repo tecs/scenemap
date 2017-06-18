@@ -56,6 +56,7 @@ func make_visible(visible):
 	else:
 		control.hide()
 		menu.hide()
-		active.selected = false
-		active.update()
-		active = null
+		if active:
+			active.selected = false
+			active.update()
+			active = null
