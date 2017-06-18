@@ -21,6 +21,7 @@ export(bool) var ySort = true setget _setEnableYSort
 
 var sortNode = YSort.new()
 var selected = false setget _setSelected
+var map = Dictionary()
 
 # Construct / Destruct
 func _ready():
@@ -99,3 +100,14 @@ func setTile(tileName):
 		sortNode.add_child(node)
 		var mapPos = posToMap(get_local_mouse_pos())
 		node.set_pos(mapToPos(mapPos))
+		var key = "%d_%d" % [mapPos.x, mapPos.y]
+		if map.has(key):
+			sortNode.remove_child(map[key])
+		map[key] = node
+
+func unsetTile():
+	var mapPos = posToMap(get_local_mouse_pos())
+	var key = "%d_%d" % [mapPos.x, mapPos.y]
+	if map.has(key):
+		sortNode.remove_child(map[key])
+		map.erase(key)
