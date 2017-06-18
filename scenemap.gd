@@ -8,10 +8,6 @@ var menu = Control.new()
 var active
 
 # Construct / Destruct
-func _ready():
-	get_selection().connect("selection_changed", self, "_selection_changed")
-	
-
 func _enter_tree():
 	var script = preload("scenemap_node.gd")
 	script.set_name(SCRIPT_NAME)
@@ -27,29 +23,39 @@ func _exit_tree():
 	if menu and menu.get_parent(): menu.get_parent().remove_child(menu)
 
 # Handlers
-func _selection_changed():
-	var selectedNodes = get_selection().get_selected_nodes()
-	var selecton = selectedNodes[0] if selectedNodes.size() == 1 else null
-	var shouldShow = selecton and selecton.get_script() and selecton.get_script().get_name() == SCRIPT_NAME
-	if not active:
-		if shouldShow: addControl(selecton)
-	else:
-		if selecton and not shouldShow: removeControl()
+func edit(object):
+	active = object
+	active.selected = true
+	active.update()
+	
+	var tileContainer = control.get_node("Panel/ItemList")
+	tileContainer.clear()
+	if active.sceneSet:
+		for tile in active.sceneSet.instance().get_children():
+			tileContainer.add_item(tile.get_name())
 
-# Public methods
-func addControl(selection):
-	if not active:
-		active = selection
-		active.selected = true
-		active.update()
-		
+func handles(object):
+	return object.get_script() and object.get_script().get_name() == SCRIPT_NAME
+
+func forward_input_event(event):
+	if event.type == InputEvent.MOUSE_BUTTON and event.is_pressed():
+		if event.button_index == BUTTON_LEFT:
+			var tilesContainer = control.get_node("Panel/ItemList")
+			var selected = tilesContainer.get_selected_items()
+			if selected.size(): active.setTile(tilesContainer.get_item_text(selected[0]))
+			return true
+		elif event.button_index == BUTTON_RIGHT:
+			active.unsetTile()
+			return true
+	return false
+
+func make_visible(visible):
+	if visible:
 		menu.show()
 		control.show()
-
-func removeControl():
-	if active:
+	else:
+		control.hide()
+		menu.hide()
 		active.selected = false
 		active.update()
 		active = null
-		control.hide()
-		menu.hide()
