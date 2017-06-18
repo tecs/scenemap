@@ -17,7 +17,7 @@ export(PackedScene) var sceneSet
 export(Vector2) var size = Vector2(64, 64) setget _setSize
 export(int, "Disabled", "Offset X", "Offset Y") var halfOffset = OFFSET_DISABLED setget _setHalfOffset
 export(int, "Top Left", "Bottom Left", "Center") var tileOrigin = ORIGIN_TOP_LEFT setget _setTileOrigin
-export(bool) var ySort = false setget _setEnableYSort
+export(bool) var ySort = true setget _setEnableYSort
 
 var sortNode = YSort.new()
 var selected = false setget _setSelected
@@ -61,7 +61,6 @@ func _setTileOrigin(newTileOrigin):
 func _setEnableYSort(enabled):
 	ySort = enabled
 	if sortNode: sortNode.set_sort_enabled(enabled)
-	update()
 
 func _setSelected(newState):
 	selected = newState
