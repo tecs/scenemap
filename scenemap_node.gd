@@ -46,18 +46,21 @@ func _draw():
 func _setMode(newMode):
 	mode = newMode
 	update()
+	repositionTiles()
 
 func _setSize(newSize):
 	size = newSize
 	update()
+	repositionTiles()
 
 func _setHalfOffset(newHalfOffset):
 	halfOffset = newHalfOffset
 	update()
+	repositionTiles()
 
 func _setTileOrigin(newTileOrigin):
 	tileOrigin = newTileOrigin
-	update()
+	repositionTiles()
 
 func _setEnableYSort(enabled):
 	ySort = enabled
@@ -111,3 +114,8 @@ func unsetTile():
 	if map.has(key):
 		sortNode.remove_child(map[key])
 		map.erase(key)
+
+func repositionTiles():
+	for key in map:
+		var coords = key.split("_")
+		map[key].set_pos(mapToPos(Vector2(coords[0].to_int(), coords[1].to_int())))
