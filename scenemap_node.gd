@@ -60,11 +60,39 @@ func _setTileOrigin(newTileOrigin):
 
 func _setEnableYSort(enabled):
 	ySort = enabled
-	if sortNode:
-		sortNode.set_sort_enabled(enabled)
+	if sortNode: sortNode.set_sort_enabled(enabled)
 	update()
 
 func _setSelected(newState):
 	selected = newState
 	update()
 
+# Public methods
+func posToMap(pos):
+	if mode == MODE_ISOMETRIC:
+		var ratio = size.normalized() * (1 / size.normalized().width)
+		pos /= ratio
+		pos = Vector2(pos.y + pos.x, pos.y - pos.x) * ratio
+	pos /= size
+	return pos.floor()
+
+func mapToPos(pos):
+	pos *= size
+	if mode == MODE_ISOMETRIC:
+		var ratio = size.normalized() * (1 / size.normalized().width)
+		pos /= ratio
+		pos = Vector2(pos.x - pos.y, pos.x + pos.y) * ratio / 2
+	return pos
+
+func createTile(tileName):
+	var scene = sceneSet.instance()
+	var node = sceneSet.instance().get_node(tileName)
+	node.get_parent().remove_child(node)
+	return node
+
+func setTile(tileName):
+	if sceneSet:
+		var node = createTile(tileName)
+		sortNode.add_child(node)
+		var mapPos = posToMap(get_local_mouse_pos())
+		node.set_pos(mapToPos(mapPos))
