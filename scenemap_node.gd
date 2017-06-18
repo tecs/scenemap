@@ -19,9 +19,15 @@ export(int, "Disabled", "Offset X", "Offset Y") var halfOffset = OFFSET_DISABLED
 export(int, "Top Left", "Bottom Left", "Center") var tileOrigin = ORIGIN_TOP_LEFT setget _setTileOrigin
 export(bool) var ySort = false setget _setEnableYSort
 
-var sortNode
+var sortNode = YSort.new()
 var selected = false setget _setSelected
 
+# Construct / Destruct
+func _ready():
+	add_child(sortNode)
+	sortNode.set_sort_enabled(ySort)
+
+# Custom draw routines
 func _draw():
 	if get_tree().is_editor_hint() and selected:
 		draw_set_transform(Vector2(), PI/4 if mode == MODE_ISOMETRIC else 0, size / sqrt(2) if mode == MODE_ISOMETRIC else size)
@@ -35,6 +41,7 @@ func _draw():
 		draw_line(Vector2(-gridSize, 0), Vector2(gridSize, 0), axisColor)
 		draw_line(Vector2(0, -gridSize), Vector2(0, gridSize), axisColor)
 
+# Setters
 func _setMode(newMode):
 	mode = newMode
 	update()
@@ -61,6 +68,3 @@ func _setSelected(newState):
 	selected = newState
 	update()
 
-func _ready():
-	sortNode = YSort.new()
-	sortNode.set_sort_enabled(ySort)
