@@ -21,12 +21,17 @@ export(bool) var ySort = true setget _setEnableYSort
 
 var sortNode = YSort.new()
 var selected = false setget _setSelected
-var map = Dictionary()
+
+var map = {}
+var nodeMap = {}
 
 # Construct / Destruct
 func _ready():
 	add_child(sortNode)
 	sortNode.set_sort_enabled(ySort)
+	if has_meta("map"):
+		map = get_meta("map")
+		rebuildTiles()
 
 # Custom draw routines
 func _draw():
@@ -91,31 +96,50 @@ func mapToPos(pos):
 		pos = Vector2(pos.x - pos.y, pos.x + pos.y) * ratio / 2
 	return pos
 
-func createTile(tileName):
+func addTile(tileName, mapPos):
+	# Create tile
 	var scene = sceneSet.instance()
 	var node = sceneSet.instance().get_node(tileName)
 	node.get_parent().remove_child(node)
-	return node
+	
+	# Add to scene
+	sortNode.add_child(node)
+	
+	# Transform position
+	node.set_pos(mapToPos(mapPos))
+	
+	# Put in dictionary
+	var key = "%d_%d" % [mapPos.x, mapPos.y]
+	if nodeMap.has(key):
+		sortNode.remove_child(nodeMap[key])
+	nodeMap[key] = node
+	
+	return key
 
 func setTile(tileName):
 	if sceneSet:
-		var node = createTile(tileName)
-		sortNode.add_child(node)
 		var mapPos = posToMap(get_local_mouse_pos())
-		node.set_pos(mapToPos(mapPos))
-		var key = "%d_%d" % [mapPos.x, mapPos.y]
-		if map.has(key):
-			sortNode.remove_child(map[key])
-		map[key] = node
+		var key = addTile(tileName, mapPos)
+		map[key] = tileName
+		set_meta("map", map)
 
 func unsetTile():
 	var mapPos = posToMap(get_local_mouse_pos())
 	var key = "%d_%d" % [mapPos.x, mapPos.y]
-	if map.has(key):
-		sortNode.remove_child(map[key])
+	if nodeMap.has(key):
+		sortNode.remove_child(nodeMap[key])
+		nodeMap.erase(key)
 		map.erase(key)
+		set_meta("map", map)
 
 func repositionTiles():
+	for key in nodeMap:
+		nodeMap[key].set_pos(mapToPos(keyToCoords(key)))
+
+func rebuildTiles():
 	for key in map:
-		var coords = key.split("_")
-		map[key].set_pos(mapToPos(Vector2(coords[0].to_int(), coords[1].to_int())))
+		addTile(map[key], keyToCoords(key))
+
+func keyToCoords(key):
+	var parts = key.split("_")
+	return Vector2(parts[0].to_int(), parts[1].to_int())
