@@ -78,6 +78,10 @@ func posToMap(pos):
 
 func mapToPos(pos):
 	pos *= size
+	if tileOrigin == ORIGIN_CENTER:
+		pos += size / 2
+	elif tileOrigin == ORIGIN_BOTTOM_LEFT:
+		pos += Vector2(0, size.height)
 	if mode == MODE_ISOMETRIC:
 		var ratio = size.normalized() * (1 / size.normalized().width)
 		pos /= ratio
