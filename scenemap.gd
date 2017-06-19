@@ -55,6 +55,12 @@ func forward_input_event(event):
 		elif event.button_index == BUTTON_RIGHT:
 			active.unsetTile()
 			return true
+	elif event.type == InputEvent.MOUSE_MOTION:
+		var tilesContainer = control.get_node("Items")
+		var selected = tilesContainer.get_selected_items()
+		if selected.size(): active.hover(tilesContainer.get_item_text(selected[0]))
+		return selected.size() > 0
+	active.unhover()
 	return false
 
 func make_visible(visible):

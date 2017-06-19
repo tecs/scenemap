@@ -21,6 +21,7 @@ export(bool) var ySort = true setget _setEnableYSort
 
 var sortNode = YSort.new()
 var selected = false setget _setSelected
+var hoverNode
 
 var map = {}
 var nodeMap = {}
@@ -96,12 +97,15 @@ func mapToPos(pos):
 		pos = Vector2(pos.x - pos.y, pos.x + pos.y) * ratio / 2
 	return pos
 
-func addTile(tileName, mapPos):
+func createTile(tileName):
 	# Create tile
 	var scene = sceneSet.instance()
 	var node = sceneSet.instance().get_node(tileName)
 	node.get_parent().remove_child(node)
-	
+	return node
+
+func addTile(tileName, mapPos):
+	var node = createTile(tileName)
 	# Add to scene
 	sortNode.add_child(node)
 	
@@ -131,6 +135,20 @@ func unsetTile():
 		nodeMap.erase(key)
 		map.erase(key)
 		set_meta("map", map)
+
+func hover(tileName):
+	if sceneSet:
+		var mapPos = posToMap(get_local_mouse_pos())
+		if hoverNode and hoverNode.get_pos() == mapPos:
+			return
+		unhover()
+		hoverNode = createTile(tileName)
+		sortNode.add_child(hoverNode)
+		hoverNode.set_pos(mapToPos(mapPos))
+		hoverNode.set_opacity(0.2)
+
+func unhover():
+	if hoverNode: sortNode.remove_child(hoverNode)
 
 func repositionTiles():
 	for key in nodeMap:
